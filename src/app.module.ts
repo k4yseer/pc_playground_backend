@@ -6,6 +6,8 @@ import { CpuModule } from './pc_sim/cpu/cpu.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+// import { ReccomendationModule } from './reccomendation/reccomendation.module';
+import { RecommendationModule } from './recommendation/recommendation.module';
 
 @Module({
   imports: [
@@ -25,7 +27,9 @@ import { join } from 'path';
       })
     }),
     // CoreModule,
-    CpuModule, 
+    CpuModule,
+    // ReccomendationModule,
+    RecommendationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

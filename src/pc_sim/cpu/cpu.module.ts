@@ -8,5 +8,6 @@ import { Cpu } from './entities/cpu.entity';
   imports: [TypeOrmModule.forFeature([Cpu])], // Add your entities here
   controllers: [CpuController],
   providers: [CpuService],
+  exports: [CpuService]
 })
 export class CpuModule {}
