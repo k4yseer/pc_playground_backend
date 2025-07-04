@@ -13,10 +13,10 @@ export class Cpu {
     @Column({ type: 'text' })
     brand: string;
 
-    @Column({ type: 'text' })
+    @Column({ type: 'integer' })
     cpu_tier: string;
 
-    @Column({ type: 'text' })
+    @Column({ type: 'integer' })
     cpu_code: string;
 
     @Column({ type: 'text' })

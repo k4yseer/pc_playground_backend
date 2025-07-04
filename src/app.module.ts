@@ -6,6 +6,7 @@ import { CpuModule } from './pc_sim/cpu/cpu.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { RecommendationModule } from './recommendation/recommendation.module';
 import { CpuCaseModule } from './pc_sim/cpu_case/cpu_case.module';
 import { CpuCoolerModule } from './pc_sim/cpu_cooler/cpu_cooler.module';
 import { GameModule } from './pc_sim/game/game.module';
@@ -30,9 +31,11 @@ import { PsuModule } from './pc_sim/psu/psu.module';
         // synchronize: true // Note: Set to false in production
       })
     }),
-    // CoreModule,
+
+    RecommendationModule,
     CpuModule, CpuCaseModule, CpuCoolerModule, GameModule, GpuModule, MotherboardModule,
     PsuModule
+
   ],
   controllers: [AppController],
   providers: [AppService],

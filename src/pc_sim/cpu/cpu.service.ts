@@ -50,3 +50,6 @@ export class CpuService {
     return await this.cpuRepository.remove(cpu); // Remove the entity from the database
   }
 }
+// async findByName(name: string): Promise<Psu[]> {
+  //   return this.psuRepository.find({ where: { psu_name: name } }); // Find PSUs by name
+  // }
