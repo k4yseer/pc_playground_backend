@@ -8,5 +8,6 @@ import { Ssd } from './entities/ssd.entity';
   imports: [TypeOrmModule.forFeature([Ssd])], // Register the Ssd entity with TypeORM
   controllers: [SsdController],
   providers: [SsdService],
+  exports: [SsdService]
 })
 export class SsdModule {}
