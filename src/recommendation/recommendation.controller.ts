@@ -3,11 +3,11 @@ import { RecommendationService } from './recommendation.service';
 import { CreateRecommendationDto } from './dto/create-recommendation.dto';
 import { UpdateRecommendationDto } from './dto/update-recommendation.dto';
 import { CpuService } from 'src/pc_sim/cpu/cpu.service';
-
+import { GameService } from 'src/pc_sim/game/game.service';
 @Controller('recommendation')
 export class RecommendationController {
   cpu: string[]
-  constructor(private readonly recommendationService: RecommendationService, private readonly cpuService: CpuService) {}
+  constructor(private readonly recommendationService: RecommendationService) {}
 
   @Post()
   create(@Body() createRecommendationDto: CreateRecommendationDto) {
@@ -16,11 +16,7 @@ export class RecommendationController {
 
   @Get()
   async cpu_reccomendation(@Body() data) {
-    return this.recommendationService.getCpuRecomendation(data.cpu_code, data.cpu_tier);
-    // let cpuAll = await this.cpuService.findAll();
-    //return cpuAll.filter(cpu => cpu.cpu_socket === 'AM5')
-    
-    // return this.recommendationService.findAll();
+    return this.recommendationService.getGameSpecs(data.gameName);
   }
 
   @Get(':id')

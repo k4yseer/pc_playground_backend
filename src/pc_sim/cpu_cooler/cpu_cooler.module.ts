@@ -8,5 +8,6 @@ import { CpuCooler } from './entities/cpu_cooler.entity';
   imports: [TypeOrmModule.forFeature([CpuCooler])], // Register the CpuCooler entity with TypeORM
   controllers: [CpuCoolerController],
   providers: [CpuCoolerService],
+  exports : [CpuCoolerService]
 })
 export class CpuCoolerModule {}

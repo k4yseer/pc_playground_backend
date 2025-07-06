@@ -8,5 +8,6 @@ import { Game } from './entities/game.entity';
   imports: [TypeOrmModule.forFeature([Game])], // Register the Game entity with TypeORM
   controllers: [GameController],
   providers: [GameService],
+  exports: [GameService]
 })
 export class GameModule {}

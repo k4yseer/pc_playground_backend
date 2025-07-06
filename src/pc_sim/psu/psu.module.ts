@@ -8,5 +8,6 @@ import { Psu } from './entities/psu.entity';
   imports: [TypeOrmModule.forFeature([Psu])], // Register the Psu entity with TypeORM
   controllers: [PsuController],
   providers: [PsuService],
+  exports: [PsuService]
 })
 export class PsuModule {}

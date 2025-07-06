@@ -8,5 +8,6 @@ import { CpuCase } from './entities/cpu_case.entity';
   imports: [TypeOrmModule.forFeature([CpuCase])], // Register the CpuCase entity with TypeORM
   controllers: [CpuCaseController],
   providers: [CpuCaseService],
+  exports: [CpuCaseService]
 })
 export class CpuCaseModule {}
