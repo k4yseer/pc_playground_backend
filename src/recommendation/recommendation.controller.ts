@@ -6,7 +6,6 @@ import { CpuService } from 'src/pc_sim/cpu/cpu.service';
 import { GameService } from 'src/pc_sim/game/game.service';
 @Controller('recommendation')
 export class RecommendationController {
-  cpu: string[]
   constructor(private readonly recommendationService: RecommendationService) {}
 
   @Post()
@@ -16,7 +15,11 @@ export class RecommendationController {
 
   @Get()
   async cpu_reccomendation(@Body() data) {
-    return this.recommendationService.getGameSpecs(data.gameName);
+    let cpu_list = this.recommendationService.getGameCpuSpecs(data.gameName)
+    let gpu_list = this.recommendationService.getGameGpuSpecs(data.gameName)
+    let motherboard_list = this.recommendationService.getMotherboardRecommendation(data.cpuIndex,data.gpuIndex)
+    let cpu_cooler_list = this.recommendationService.getCpuCoolerRecommendation(data.cpuIndex)
+    return cpu_cooler_list
   }
 
   @Get(':id')
