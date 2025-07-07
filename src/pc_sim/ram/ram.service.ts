@@ -28,8 +28,8 @@ export class RamService {
     return this.ramRepository.findOne({ where: { ram_id: id } });
   }
 
-  update(id: number, updateRamDto: UpdateRamDto) {
-    const ram = this.ramRepository.findOne({ where: { ram_id: id } });
+  async update(id: number, updateRamDto: UpdateRamDto) {
+    const ram = await this.ramRepository.findOne({ where: { ram_id: id } });
     if (!ram) {
       throw new Error(`Ram with id ${id} not found`);
     }
@@ -38,8 +38,8 @@ export class RamService {
     return this.ramRepository.save(ram); // Save the updated entity back to the database
   }
 
-  remove(id: number) {
-    const ram = this.ramRepository.findOne({ where: { ram_id: id } });
+  async remove(id: number) {
+    const ram = await this.ramRepository.findOne({ where: { ram_id: id } });
     if (!ram) {
       throw new Error(`Ram with id ${id} not found`);
     }

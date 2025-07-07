@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity()
 export class Ram {
     @PrimaryGeneratedColumn({ name: 'ram_id' })
-    ramId: number;
+    ram_id: number;
     
     @Column({ name: 'ram_name', type: 'text' })
     ramName: string;
