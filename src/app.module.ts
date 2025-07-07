@@ -13,6 +13,8 @@ import { GameModule } from './pc_sim/game/game.module';
 import { GpuModule } from './pc_sim/gpu/gpu.module';
 import { MotherboardModule } from './pc_sim/motherboard/motherboard.module';
 import { PsuModule } from './pc_sim/psu/psu.module';
+import { SsdModule } from './pc_sim/ssd/ssd.module';
+import { RamModule } from './pc_sim/ram/ram.module';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { PsuModule } from './pc_sim/psu/psu.module';
 
     RecommendationModule,
     CpuModule, CpuCaseModule, CpuCoolerModule, GameModule, GpuModule, MotherboardModule,
-    PsuModule
+    PsuModule, SsdModule, RamModule
 
   ],
   controllers: [AppController],

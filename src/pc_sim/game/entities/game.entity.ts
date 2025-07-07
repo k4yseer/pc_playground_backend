@@ -17,6 +17,9 @@ export class Game {
     @Column({ type: 'text' })
     graphics: string;
 
+    @Column({ type: 'text' })
+    image: string;
+
     @Column({ type: 'text', nullable: true })
     directx: string;
 
