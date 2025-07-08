@@ -17,10 +17,10 @@ import { SsdModule } from 'src/pc_sim/ssd/ssd.module';
   imports: [
     CpuModule,
     GameModule,
-    // GpuModule,
-    // MotherboardModule,
+    GpuModule,
+    MotherboardModule,
     // CpuCaseModule,
-    // CpuCoolerModule,
+    CpuCoolerModule,
     // PsuModule,
     // RamModule,
     // SsdModule
