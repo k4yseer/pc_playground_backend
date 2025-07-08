@@ -19,7 +19,11 @@ export class RecommendationController {
     let gpu_list = this.recommendationService.getGameGpuSpecs(data.gameName)
     let motherboard_list = this.recommendationService.getMotherboardRecommendation(data.cpuIndex,data.gpuIndex)
     let cpu_cooler_list = this.recommendationService.getCpuCoolerRecommendation(data.cpuIndex)
-    return cpu_cooler_list
+    let ram_list = this.recommendationService.getRamRecommendation(data.motherboardIndex,data.gameName)
+    let ssd_list = this.recommendationService.getSsdRecommendation(data.motherboardIndex,data.gameName)
+    let psu_list = this.recommendationService.getPsuRecommendation(data.cpuIndex,data.gpuIndex,data.motherboardIndex)
+    let case_list = this.recommendationService.getCaseRecommendation(data.gpuIndex,data.coolerIndex,data.motherboardIndex,data.psuIndex)
+    return case_list
   }
 
   @Get(':id')
