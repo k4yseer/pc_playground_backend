@@ -452,11 +452,173 @@ export class RecommendationService {
     })
    return caseList 
   }
+async getPresetCpu() {
+  //format: cpu, gpu, motherboard, cpu_cooler, ssd, ram, psu, case
+    const low_tier = [
+      await this.cpuService.findOne(140),
+      await this.gpuService.findOne(207),
+      await this.motherboardService.findOne(167),
+      await this.CpuCoolerService.findOne(10),
+      await this.SsdService.findOne(337),
+      await this.RamService.findOne(637),
+      await this.PsuService.findOne(53),
+      await this.CpuCaseService.findOne(39)   
+    ]
+    const high_tier = [
+      await this.cpuService.findOne(199),
+      await this.gpuService.findOne(6),
+      await this.motherboardService.findOne(1),
+      await this.CpuCoolerService.findOne(26),
+      await this.SsdService.findOne(8),
+      await this.RamService.findOne(2969),
+      await this.PsuService.findOne(1),
+      await this.CpuCaseService.findOne(1)
+    ]
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return [low_tier,high_tier]
 }
+    
+   
 
+    //return high_level
+ async getGameAllspecs(gameId) {
+    let gameAll = await this.gameService.findAll()
+    
+    var gameIntelProcessorTier = 0
+    var gameAmdProcessorTier = 0
+    var gameIntelProcessorCode = 0
+    var gameAmdProcessorCode = 0
+    var gameMemory = 0
+    var gameIntelGraphics = 0
+    var gameAmdGraphics = 0
+    var gameStorage = 0
+
+    gameId.forEach(id => {
+          gameAll.forEach(game => {
+            if (id == game.game_id) {
+              gameStorage = Number(game.storage.split(' GB')[0])
+
+              let ramSpec = game.memory.split(' ')  
+              gameMemory = Number(ramSpec[0])
+              
+              const regexGraphicsPattern = new RegExp('\\b(RTX|GTX|RX)\\s*(\\d{3,4})\\b','gi');
+              const gpuRequirements = Array.from(game.graphics.matchAll(regexGraphicsPattern))
+              //console.log(gpuRequirements)
+              let gamebrand = gpuRequirements[1]
+              for (const requirement of gpuRequirements) {
+                let typeRequirement = new Map<string,string>()
+                typeRequirement.set('chip', requirement[2])
+                
+                if (requirement[1] == 'GTX' || requirement[1] == 'RTX') {
+                  typeRequirement.set('type', 'RTX')
+                }
+                else {
+                  typeRequirement.set('type', requirement[1])
+                }
+                
+                if (typeRequirement.get('type') == 'RTX') {
+                  gameIntelGraphics = Number(typeRequirement.get("chip"))
+                }
+                else if (typeRequirement.get('type') == 'RX') {
+                  gameAmdGraphics = Number(typeRequirement.get('chip'))
+                }
+              }
+            const regexPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
+          const cpuRequirements = Array.from(game.processor.matchAll(regexPattern))
+        for (const requirement of cpuRequirements) {
+          let brandRequirement = new Map<string,string>()
+          brandRequirement.set('brand',requirement[1])
+          brandRequirement.set('tier',requirement[3])
+          brandRequirement.set('code',requirement[5])
+
+          //console.log(brandRequirement.get('brand'))
+          if (brandRequirement.get('brand') == 'Intel') {
+            gameIntelProcessorTier = Number(brandRequirement.get('tier'))
+            gameIntelProcessorCode = Number(brandRequirement.get('code'))
+            //console.log(gameIntelProcessorCode)
+          }
+          else if (brandRequirement.get('brand') == 'AMD') {
+            gameAmdProcessorTier = Number(brandRequirement.get('tier'))
+            gameAmdProcessorCode = Number(brandRequirement.get('code'))
+           //console.log(gameAmdProcessorTier)
+            
+          }   
+        }
+      }})}
+    )
+    //console.log(gameAmdGraphics,gameAmdProcessorCode,gameAmdProcessorTier,gameIntelGraphics,gameIntelProcessorCode,gameIntelProcessorTier,gameMemory,gameStorage)
+    return [gameIntelProcessorTier,gameIntelProcessorCode,gameAmdProcessorTier,gameAmdProcessorCode,gameIntelGraphics,gameAmdGraphics,gameMemory,gameStorage]
+  }
+    //Comparing Low-tier to gameRequirement
+  async getBestPreset(gameId) {
+    const presets = await this.getPresetCpu() //IMPT: Preset is lowest to highest
+    const gameSpecs = await this.getGameAllspecs(gameId)
+    
+    const [gameIntelProcessorTier,gameIntelProcessorCode,gameAmdProcessorTier,gameAmdProcessorCode,gameIntelGraphics,gameAmdGraphics,gameMemory,gameStorage] = gameSpecs
+    //Preset[0] == Cpu Object
+    for (let preset of presets) {
+    // Destructure the tier for clarity (order: cpu, gpu, motherboard, cooler, ssd, ram, psu, case)
+      const [presetCpu, presetGpu, presetMotherboard, presetCooler, presetSsd, presetRam, presetPsu, presetCase] = preset
+
+      if (presetCpu && 'brand' in presetCpu) { // ThIS IS FOR CPU OBJECT
+        //console.log(presetCpu.brand)
+        if (presetCpu.brand == 'Intel') {
+          if (Number(presetCpu.cpu_tier) < gameIntelProcessorTier || Number(presetCpu.cpu_code)< gameIntelProcessorCode) {
+            continue
+          }
+        }
+        else if (presetCpu.brand == 'AMD') {
+          if (Number(presetCpu.cpu_tier) < gameAmdProcessorTier || Number(presetCpu.cpu_code) < gameAmdProcessorCode) {
+            continue
+          }
+        }
+        else {
+          return 'Error code 1'
+        }
+       }
+
+      if (presetGpu && 'gpu_code' in presetGpu ) { //THIS IS FOR GPU OBJECT
+        let presetGpuBrand = presetGpu.gpu_code.split(' ')[0]
+        let presetGpuCode = presetGpu.gpu_code.split(' ')[1] 
+        //console.log(presetGpuCode)
+        
+        if (presetGpuBrand == 'RTX' || presetGpuBrand == 'GTX') {
+          if (Number(presetGpuCode) < gameIntelGraphics) {
+            continue
+          }
+        }
+        else if (presetGpuBrand == 'RX') {
+          if (Number(presetGpuCode) < gameAmdGraphics) {
+            continue
+          }
+        }
+        else {
+          return 'Error code 2'
+        }
+      }
+
+      if (presetRam && 'capacity' in presetRam && "ram_id" in presetRam) { //THIS IS FOR RAM
+        let presetRamCapacity = Number(presetRam.capacity.split('GB')[0])
+        if (presetRamCapacity < gameMemory) {
+          continue
+        }
+      }
+
+      if (presetSsd && 'capacity' in presetSsd && 'ssd_id' in presetSsd) { //THIS IS FOR SSD
+        if (Number(presetSsd.capacity) < gameStorage) {
+          continue
+        }
+      }
+      return preset
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+}
 // {
 //   "cpu": {},
 //   "gpu": {}
 // }
+  
+
+  // check if everything works together
