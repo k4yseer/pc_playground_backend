@@ -305,12 +305,12 @@ export class RecommendationService {
           let gameTempRam = Number(game.memory.split(' GB')[0])
           if (gameTempRam > gameRam) {
             gameRam = gameTempRam
-            console.log(gameRam)
+            //console.log(gameRam)
           }
         }
        }) 
     });
-    console.log(gameRam)
+    //console.log(gameRam)
     let motherboardSpecs =  await this.motherboardService.findOne(motherboardIndex)
 
     // return(motherboardSpecs)
@@ -343,7 +343,7 @@ export class RecommendationService {
           let gameTempStorage = Number(game.storage.split(' GB')[0])
           if (gameTempStorage > gameStorage) {
             gameStorage = gameTempStorage
-            console.log(gameStorage)
+            //console.log(gameStorage)
           }
         }
        }) 

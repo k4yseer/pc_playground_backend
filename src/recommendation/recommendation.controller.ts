@@ -13,42 +13,42 @@ export class RecommendationController {
     return this.recommendationService.create(createRecommendationDto);
   }
 
-  @Get('cpu') // require list of gameId
+  @Post('cpu') // require list of gameId
   async cpu_recommendation(@Body() data) {
     let cpu_list = this.recommendationService.getGameCpuSpecs(data.gameId)
     return cpu_list }
 
-  @Get('gpu') // require gameId
+  @Post('gpu') // require gameId
   async gpu_recommendation(@Body() data) {
     let gpu_list = this.recommendationService.getGameGpuSpecs(data.gameId)
     return gpu_list}
 
-  @Get('motherboard') //require CpuIndex & gpuIndex
+  @Post('motherboard') //require CpuIndex & gpuIndex
   async motherboard_recommendation(@Body() data) {
     let motherboard_list = this.recommendationService.getMotherboardRecommendation(data.cpuIndex,data.gpuIndex)
     return motherboard_list}
 
-  @Get('cpu_cooler') // require CpuIndex
+  @Post('cpu_cooler') // require CpuIndex
   async cpu_cooler_recommendation(@Body() data) {
     let cpu_cooler_list = this.recommendationService.getCpuCoolerRecommendation(data.cpuIndex)
     return cpu_cooler_list }
 
-  @Get('ram') // require gameName & motherboardIndex
+  @Post('ram') // require gameName & motherboardIndex
   async ram_recommendation(@Body() data) {
     let ram_list = this.recommendationService.getRamRecommendation(data.motherboardIndex,data.gameId)
     return ram_list}
 
-  @Get ('ssd') // require gameName & motherboardIndex
+  @Post ('ssd') // require gameName & motherboardIndex
   async ssd_recommendation(@Body() data) {
     let ssd_list = this.recommendationService.getSsdRecommendation(data.motherboardIndex,data.gameId)
     return ssd_list}
     
-  @Get('psu') //require cpuIndex, gpuIndex, motherboardIndex
+  @Post('psu') //require cpuIndex, gpuIndex, motherboardIndex
   async psu_recommendation(@Body() data) {
     let psu_list = this.recommendationService.getPsuRecommendation(data.cpuIndex,data.gpuIndex,data.motherboardIndex) 
     return psu_list}
     
-  @Get('case') //require gpuIndex, coolerIndex, motherboardIndex, psuIndex
+  @Post('case') //require gpuIndex, coolerIndex, motherboardIndex, psuIndex
    async case_recommendation(@Body() data) {
     let case_list = this.recommendationService.getCaseRecommendation(data.gpuIndex,data.coolerIndex,data.motherboardIndex,data.psuIndex)
     return case_list
