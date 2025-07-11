@@ -50,50 +50,82 @@ export class RecommendationService {
     return `This action removes a #${id} recommendation`;
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  async getGameCpuSpecs(gameName:string) {
+  async getGameCpuSpecs(gameIdList:number[]) {
+    //const game = await this.gameService.findOne(gameId)
     let gameAll = await this.gameService.findAll();
-    const game = gameAll.find(gameProduct => gameProduct.game == gameName)
+    var intel_cpu_tier = 0
+    var intel_cpu_code = 0
+    var amd_cpu_tier = 0
+    var amd_cpu_code = 0
 
-    const regexPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
+    var game1_intel_cpu_tier = 0
+    var game1_intel_cpu_code = 0
+    var game1_amd_cpu_tier = 0
+    var game1_amd_cpu_code = 0
 
-    if (game) {
-      // const testString = "Intel Core i5-8400 / AMD Ryzen 5 1600";
-      // const matches = Array.from(testString.matchAll(regexPattern));
-      // console.log(matches);
-      let gameCpuRequirements = game.processor
-      //console.log(gameCpuRequirements)
-      const cpuRequirements = Array.from(gameCpuRequirements.matchAll(regexPattern))
+    var game2_intel_cpu_tier = 0
+    var game2_intel_cpu_code = 0
+    var game2_amd_cpu_tier = 0
+    var game2_amd_cpu_code = 0
 
-      //console.log(cpuRequirements)
-      var intel_cpu_tier = 0
-      var intel_cpu_code = 0
-      var amd_cpu_tier = 1
-      var amd_cpu_code = 0
-
+    gameAll.forEach(games => {
+      if (games.game_id == gameIdList[0]) {
+        let game1_cpu_requirement = games.processor
+        const regexPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
+        const cpuRequirements = Array.from(game1_cpu_requirement.matchAll(regexPattern))
       for (const requirement of cpuRequirements) {
-        let brandRequirement = new Map<string,string>()
-        brandRequirement.set('brand',requirement[1])
-        brandRequirement.set('tier',requirement[3])
-        brandRequirement.set('code',requirement[5])
+        let brandRequirement1 = new Map<string,string>()
+        brandRequirement1.set('brand',requirement[1])
+        brandRequirement1.set('tier',requirement[3])
+        brandRequirement1.set('code',requirement[5])
 
         //console.log(brandRequirement.get('brand'))
-        if (brandRequirement.get('brand') == 'Intel') {
-          intel_cpu_tier = Number(brandRequirement.get('tier'))
-          intel_cpu_code = Number(brandRequirement.get('code'))
+        if (brandRequirement1.get('brand') == 'Intel') {
+          game1_intel_cpu_tier = Number(brandRequirement1.get('tier'))
+          game1_intel_cpu_code = Number(brandRequirement1.get('code'))
           //console.log(intel_cpu_code)
         }
-        else if (brandRequirement.get('brand') == 'AMD') {
-          amd_cpu_tier = Number(brandRequirement.get('tier'))
-          amd_cpu_code = Number(brandRequirement.get('code'))
+        else if (brandRequirement1.get('brand') == 'AMD') {
+          game1_amd_cpu_tier = Number(brandRequirement1.get('tier'))
+          game1_amd_cpu_code = Number(brandRequirement1.get('code'))
          // console.log(amd_cpu_code)
           
         }   
-      }
-      //console.log(intel_cpu_tier,intel_cpu_code,amd_cpu_tier,amd_cpu_code)
+      }}});
+
+      gameAll.forEach(games => {
+      if (games.game_id == gameIdList[1]) {
+        let game2_cpu_requirement = games.processor
+        const regexPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
+        const cpuRequirements = Array.from(game2_cpu_requirement.matchAll(regexPattern))
+
+        for (const requirement of cpuRequirements) {
+        let brandRequirement2 = new Map<string,string>()
+        brandRequirement2.set('brand',requirement[1])
+        brandRequirement2.set('tier',requirement[3])
+        brandRequirement2.set('code',requirement[5])
+
+        //console.log(brandRequirement.get('brand'))
+        if (brandRequirement2.get('brand') == 'Intel') {
+          game2_intel_cpu_tier = Number(brandRequirement2.get('tier'))
+          game2_intel_cpu_code = Number(brandRequirement2.get('code'))
+          //console.log(intel_cpu_code)
+        }
+        else if (brandRequirement2.get('brand') == 'AMD') {
+          game2_amd_cpu_tier = Number(brandRequirement2.get('tier'))
+          game2_amd_cpu_code = Number(brandRequirement2.get('code'))
+         // console.log(amd_cpu_code)
+          
+        }   
+      }}});
+
+      intel_cpu_tier = Math.max(game1_intel_cpu_tier,game2_intel_cpu_tier)
+      intel_cpu_code = Math.max(game1_intel_cpu_code,game2_intel_cpu_code)
+      amd_cpu_tier = Math.max(game1_amd_cpu_tier,game2_amd_cpu_tier)
+      amd_cpu_code = Math.max(game1_amd_cpu_code,game2_amd_cpu_code)
+
       return (this.getCpuRecomendation(intel_cpu_tier,intel_cpu_code,amd_cpu_tier,amd_cpu_code)) 
     };
-    
-    }
 
   async getCpuRecomendation(intel_cpu_tier,intel_cpu_code,amd_cpu_tier,amd_cpu_code) {
     // let cpu_tier = 5
@@ -120,23 +152,63 @@ export class RecommendationService {
     return cpuFilter
   }
 
-  async getGameGpuSpecs(gameName) {
+  async getGameGpuSpecs(gameId:number[]) {
+
+    var rx_type = 'RX'
+    var rx_chip = 0
+    var rtx_type = 'RTX'
+    var rtx_chip = 0
+
+    var game1_rx_type = ''
+    var game1_rx_chip = 0
+    var game1_rtx_type = ''
+    var game1_rtx_chip = 0
+
+    var game2_rx_type = ''
+    var game2_rx_chip = 0
+    var game2_rtx_type = ''
+    var game2_rtx_chip = 0
 
     let gameAll = await this.gameService.findAll();
-    const gameSpecs = gameAll.find(gameProduct => gameProduct.game == gameName)
-    const regexPattern = new RegExp('\\b(RTX|GTX|RX)\\s*(\\d{3,4})\\b','gi');
+    // const gameSpecs = gameAll.find(gameProduct => gameProduct.game == gameName)
+    gameAll.forEach(game=>{
+      if (game.game_id == gameId[0]) {
+        let game1Specs = game.graphics
+        const regexPattern = new RegExp('\\b(RTX|GTX|RX)\\s*(\\d{3,4})\\b','gi');
+        const gpuRequirements = Array.from(game1Specs.matchAll(regexPattern))
+        for (const requirement of gpuRequirements) {
+          let typeRequirement = new Map<string,string>()
+          typeRequirement.set('chip', requirement[2])
+          
+          if (requirement[1] == 'GTX' || requirement[1] == 'RTX') {
+            typeRequirement.set('type', 'RTX')
+          }
+          else {
+            typeRequirement.set('type', requirement[1])
+          }
 
-    if (gameSpecs) {
-      const gpuRequirements = Array.from(gameSpecs.graphics.matchAll(regexPattern))
-      // console.log(gpuRequirements)
-      var rx_type = ''
-      var rx_chip = 0
-      var rtx_type = ''
-      var rtx_chip = 0
+          //console.log(requirement)
+
+          if (typeRequirement.get('type') == 'RTX') {
+            game1_rtx_type = String(typeRequirement.get("type"))
+            game1_rtx_chip = Number(typeRequirement.get("chip"))
+          }
+          else if (typeRequirement.get('type') == 'RX') {
+            game1_rx_type = String(typeRequirement.get('type'))
+            game1_rx_chip = Number(typeRequirement.get('chip'))
+          }
+        }
+      }})
+
+    gameAll.forEach(game=>{
+      if (game.game_id == gameId[1]) {
+      let game2Specs = game.graphics
+      const regexPattern = new RegExp('\\b(RTX|GTX|RX)\\s*(\\d{3,4})\\b','gi');
+      const gpuRequirements = Array.from(game2Specs.matchAll(regexPattern))
       for (const requirement of gpuRequirements) {
         let typeRequirement = new Map<string,string>()
         typeRequirement.set('chip', requirement[2])
-
+        
         if (requirement[1] == 'GTX' || requirement[1] == 'RTX') {
           typeRequirement.set('type', 'RTX')
         }
@@ -147,24 +219,22 @@ export class RecommendationService {
         //console.log(requirement)
 
         if (typeRequirement.get('type') == 'RTX') {
-          rtx_type = String(typeRequirement.get("type"))
-          rtx_chip = Number(typeRequirement.get("chip"))
+          game2_rtx_type = String(typeRequirement.get("type"))
+          game2_rtx_chip = Number(typeRequirement.get("chip"))
         }
         else if (typeRequirement.get('type') == 'RX') {
-          rx_type = String(typeRequirement.get('type'))
-          rx_chip = Number(typeRequirement.get('chip'))
+          game2_rx_type = String(typeRequirement.get('type'))
+          game2_rx_chip = Number(typeRequirement.get('chip'))
         }
       }
+    }})
+
+      rtx_chip = Math.max(game1_rtx_chip,game2_rtx_chip)
+      rx_chip = Math.max(game1_rx_chip, game2_rx_chip)
       //console.log(rx_type,rx_chip,rtx_type,rtx_chip)
       return this.getGpuRecommendation(rx_type, rx_chip, rtx_type, rtx_chip)
     }
-    // let rx_type = 'RX'
-    // let rx_chip = 580
-    // let rtx_type = "RTX"
-    // let rtx_chip = 1060
-    // return this.getGpuRecommendation(rx_type, rx_chip, rtx_type, rtx_chip)
     
-  }
 
   async getGpuRecommendation(rx_type, rx_chip, rtx_type, rtx_chip) {
     let gpuAll = await this.gpuService.findAll()
@@ -225,15 +295,22 @@ export class RecommendationService {
     }
   }
 
-  async getRamRecommendation(motherboardIndex,gameName) {
+  async getRamRecommendation(motherboardIndex,gameId) {
     let gameAll = await this.gameService.findAll()
-    let gameSpecs = gameAll.find(gameProduct => gameProduct.game == gameName)
     let gameRam = 0
 
-    if (gameSpecs) {
-        gameRam = Number(gameSpecs.memory.split(' GB')[0])
-    }
-
+    gameId.forEach(id => {
+       gameAll.forEach(game => {
+        if (id == game.game_id) {
+          let gameTempRam = Number(game.memory.split(' GB')[0])
+          if (gameTempRam > gameRam) {
+            gameRam = gameTempRam
+            console.log(gameRam)
+          }
+        }
+       }) 
+    });
+    console.log(gameRam)
     let motherboardSpecs =  await this.motherboardService.findOne(motherboardIndex)
 
     // return(motherboardSpecs)
@@ -252,17 +329,25 @@ export class RecommendationService {
     }
   }
 
-  async getSsdRecommendation(motherboardIndex,gameName)   {
+  async getSsdRecommendation(motherboardIndex,gameId)   {
     let motherboardSpecs = await this.motherboardService.findOne(motherboardIndex)
     let gameAll = await this.gameService.findAll()
-    let gameSpecs = gameAll.find(gameProduct => gameProduct.game == gameName)
+    //let gameSpecs = gameAll.find(gameProduct => gameProduct.game == gameName)
     let ssdAll = await this.SsdService.findAll()
 
     let gameStorage = 0
 
-    if (gameSpecs) {
-      gameStorage = Number(gameSpecs.storage.split(' GB')[0])
-    }
+    gameId.forEach(id => {
+       gameAll.forEach(game => {
+        if (id == game.game_id) {
+          let gameTempStorage = Number(game.storage.split(' GB')[0])
+          if (gameTempStorage > gameStorage) {
+            gameStorage = gameTempStorage
+            console.log(gameStorage)
+          }
+        }
+       }) 
+    });
 
     if (motherboardSpecs && gameStorage > 0) {
       let m2_support_list = motherboardSpecs.m2_support.split(' ')
@@ -326,6 +411,7 @@ export class RecommendationService {
     let coolerMaxDimension = 0 
     let motherboardType = ''
     let psuMaxDimension = 0
+    
     if (gpuSpec && coolerSpec && psuSpec && motherboardSpec) {
       gpuMaxDimension = Number(gpuSpec.dimension)
 

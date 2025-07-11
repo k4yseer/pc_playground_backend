@@ -13,14 +13,14 @@ export class RecommendationController {
     return this.recommendationService.create(createRecommendationDto);
   }
 
-  @Get('cpu') // require gameName
+  @Get('cpu') // require list of gameId
   async cpu_recommendation(@Body() data) {
-    let cpu_list = this.recommendationService.getGameCpuSpecs(data.gameName)
+    let cpu_list = this.recommendationService.getGameCpuSpecs(data.gameId)
     return cpu_list }
 
-  @Get('gpu') // require gameName
+  @Get('gpu') // require gameId
   async gpu_recommendation(@Body() data) {
-    let gpu_list = this.recommendationService.getGameGpuSpecs(data.gameName)
+    let gpu_list = this.recommendationService.getGameGpuSpecs(data.gameId)
     return gpu_list}
 
   @Get('motherboard') //require CpuIndex & gpuIndex
@@ -35,12 +35,12 @@ export class RecommendationController {
 
   @Get('ram') // require gameName & motherboardIndex
   async ram_recommendation(@Body() data) {
-    let ram_list = this.recommendationService.getRamRecommendation(data.motherboardIndex,data.gameName)
+    let ram_list = this.recommendationService.getRamRecommendation(data.motherboardIndex,data.gameId)
     return ram_list}
 
   @Get ('ssd') // require gameName & motherboardIndex
   async ssd_recommendation(@Body() data) {
-    let ssd_list = this.recommendationService.getSsdRecommendation(data.motherboardIndex,data.gameName)
+    let ssd_list = this.recommendationService.getSsdRecommendation(data.motherboardIndex,data.gameId)
     return ssd_list}
     
   @Get('psu') //require cpuIndex, gpuIndex, motherboardIndex
