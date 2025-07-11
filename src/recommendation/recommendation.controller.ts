@@ -54,6 +54,10 @@ export class RecommendationController {
     return case_list
   }
 
+  @Post('preset')
+    async preset_recomendation (@Body() data) {
+      return this.recommendationService.getBestPreset(data.gameId)
+    }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.recommendationService.findOne(+id);
