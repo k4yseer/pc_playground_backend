@@ -41,4 +41,16 @@ export class GpuService {
     }
     return await this.gpuRepository.remove(gpu); // Remove the entity from the database
   }
+
+  async findByGpuFilepath(gpuId: number): Promise<string | null> {
+    const gpu = await this.gpuRepository.findOne({ 
+      where: { gpu_id: gpuId },
+      select: ['gpu_id', 'gpuFilepath'] // Select only the necessary fields
+     });
+
+    if (!gpu) {
+      throw new Error(`Gpu with id ${gpuId} not found`);
+    }
+    return gpu.gpuFilepath; // Return the file path of the GPU
+  }
 }

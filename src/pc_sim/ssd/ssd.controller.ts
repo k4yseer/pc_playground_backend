@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { SsdService } from './ssd.service';
 import { CreateSsdDto } from './dto/create-ssd.dto';
 import { UpdateSsdDto } from './dto/update-ssd.dto';
@@ -30,5 +30,14 @@ export class SsdController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ssdService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.ssdService.findBySsdFilepath(+id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

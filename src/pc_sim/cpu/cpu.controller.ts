@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } 
 import { CpuService } from './cpu.service';
 import { CreateCpuDto } from './dto/create-cpu.dto';
 import { UpdateCpuDto } from './dto/update-cpu.dto';
+import { get } from 'http';
 
 @Controller('cpu')
 export class CpuController {
@@ -31,4 +32,14 @@ export class CpuController {
   remove(@Param('id') id: string) {
     return this.cpuService.remove(+id);
   }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+      const url = await this.cpuService.findByCpuFilepath(id);
+      if (url === null) {
+        return { url: null};
+    }
+    return { url };
+  }
 }
+

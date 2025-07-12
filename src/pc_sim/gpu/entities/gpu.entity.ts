@@ -25,4 +25,7 @@ export class Gpu {
     
     @Column({ type: 'integer' })
     dimension: number;
+
+    @Column({ type: 'text', nullable: true })
+    gpuFilepath: string | null; // Optional field for the file path of the GPU
 }

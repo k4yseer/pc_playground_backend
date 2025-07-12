@@ -6,4 +6,5 @@ export class CreateGpuDto {
     power_connector_slots: number;
     tdp: string;
     dimension: number;
+    gpuFilepath?: string | null; // Optional field for the file path of the GPU
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { RamService } from './ram.service';
 import { CreateRamDto } from './dto/create-ram.dto';
 import { UpdateRamDto } from './dto/update-ram.dto';
@@ -30,5 +30,14 @@ export class RamController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ramService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.ramService.findByRamFilepath(+id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

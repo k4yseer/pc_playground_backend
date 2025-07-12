@@ -16,6 +16,9 @@ export class Ssd {
     
     @Column({ type: 'text' })
     capacity: string; // e.g., "500GB", "1TB"
+
+    @Column({ type: 'text', nullable: true })
+    ssdFilepath: string | null; // Optional field for the file path of the
 }
 
 

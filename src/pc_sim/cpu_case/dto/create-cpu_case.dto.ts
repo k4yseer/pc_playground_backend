@@ -7,4 +7,5 @@ export class CreateCpuCaseDto {
     gpu_size_clearance: number;
     cpu_cooler_clearance: number;
     dimension: string;
+    cpuCaseFilepath?: string | null; // Optional field for the file path of the CPU case
 }

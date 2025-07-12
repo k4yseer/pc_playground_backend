@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { GpuService } from './gpu.service';
 import { CreateGpuDto } from './dto/create-gpu.dto';
 import { UpdateGpuDto } from './dto/update-gpu.dto';
+import { get } from 'http';
 
 @Controller('gpu')
 export class GpuController {
@@ -30,5 +31,14 @@ export class GpuController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gpuService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.gpuService.findByGpuFilepath(+id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

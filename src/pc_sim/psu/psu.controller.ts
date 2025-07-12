@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { PsuService } from './psu.service';
 import { CreatePsuDto } from './dto/create-psu.dto';
 import { UpdatePsuDto } from './dto/update-psu.dto';
@@ -30,5 +30,14 @@ export class PsuController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.psuService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.psuService.findByPsuFilepath(+id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

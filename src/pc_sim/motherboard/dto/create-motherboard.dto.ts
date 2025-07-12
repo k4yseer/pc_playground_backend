@@ -14,4 +14,5 @@ export class CreateMotherboardDto {
     wifi_enabled: boolean;
     bluetooth_enabled: boolean;
     audio_chipset: string;
+    motherboardFilepath?: string | null; // Optional field for the file path of the motherboard
 }

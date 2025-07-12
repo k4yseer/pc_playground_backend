@@ -5,4 +5,5 @@ export class CreateCpuCoolerDto {
     amd_socket: string;
     reccomended_tdp: number;
     dimension: string;
+    cpuCoolerFilepath?: string | null; // Optional field for the file path of the CPU cooler
 }

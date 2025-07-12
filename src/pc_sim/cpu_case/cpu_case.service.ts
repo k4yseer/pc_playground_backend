@@ -44,4 +44,17 @@ export class CpuCaseService {
     }
     return await this.cpuCaseRepository.remove(cpuCase); // Remove the entity from the database
   }
+
+  async findByCpuCaseFilepath(cpuCaseId: number): Promise<string | null> {
+    const cpuCase = await this.cpuCaseRepository.findOne({ 
+      where: { cpu_case_id: cpuCaseId },
+      select: ['cpu_case_id', 'cpuCaseFilepath'] // Select only the necessary fields
+    });
+
+    if (!cpuCase) {
+      throw new Error(`CpuCase with id ${cpuCaseId} not found`);
+    }
+
+    return cpuCase.cpuCaseFilepath; // Return the file path or null if not set
+  }
 }

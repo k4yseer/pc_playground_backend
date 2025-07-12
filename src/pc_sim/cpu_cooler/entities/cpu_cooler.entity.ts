@@ -19,5 +19,8 @@ export class CpuCooler {
 
     @Column({ type: 'text' })
     dimension: string;
+
+    @Column({ type: 'text', nullable: true })
+    cpuCoolerFilepath: string | null; // Optional field for the file path of
 }
 

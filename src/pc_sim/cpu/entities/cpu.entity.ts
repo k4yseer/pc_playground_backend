@@ -36,4 +36,7 @@ export class Cpu {
 
     @Column({ type: 'text' })
     max_clock: string;
+
+    @Column({ type: 'text', nullable: true })
+    cpuFilepath: string | null;
 }

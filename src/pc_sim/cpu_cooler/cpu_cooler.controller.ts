@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { CpuCoolerService } from './cpu_cooler.service';
 import { CreateCpuCoolerDto } from './dto/create-cpu_cooler.dto';
 import { UpdateCpuCoolerDto } from './dto/update-cpu_cooler.dto';
@@ -30,5 +30,14 @@ export class CpuCoolerController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cpuCoolerService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.cpuCoolerService.findByCpuCoolerFilepath(id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

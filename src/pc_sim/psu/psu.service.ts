@@ -45,4 +45,17 @@ export class PsuService {
   // async findByName(name: string): Promise<Psu[]> {
   //   return this.psuRepository.find({ where: { psu_name: name } }); // Find PSUs by name
   // }
+
+  async findByPsuFilepath(psuId: number): Promise<string | null> {
+    const psu = await this.psuRepository.findOne({ 
+      where: { psu_id: psuId },
+      select: ['psu_id', 'psuFilepath'] // Select only the necessary fields
+    });
+
+    if (!psu) {
+      throw new Error(`Psu with id ${psuId} not found`);
+    }
+
+    return psu.psuFilepath; // Return the file path of the PSU
+  }
 }

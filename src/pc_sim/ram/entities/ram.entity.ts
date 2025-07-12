@@ -16,4 +16,7 @@ export class Ram {
     
     @Column({ name: 'speed', type: 'text' })
     speed: string;
+
+    @Column({ name: 'ram_filepath', type: 'text', nullable: true })
+    ramFilepath: string | null; // Optional field for the file path of the RAM
 }

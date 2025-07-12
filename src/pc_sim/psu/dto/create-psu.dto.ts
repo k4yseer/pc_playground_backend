@@ -7,4 +7,5 @@ export class CreatePsuDto {
     fan_size: number; // Size of the PSU fan in mm
     dimensions: string; // Dimensions of the PSU (e.g., "150mm x 140mm x 86mm")
     cables_included: string[]; // List of cables included with the PSU
+    psuFilepath?: string | null; // Optional field for the file path of the PSU model
 }

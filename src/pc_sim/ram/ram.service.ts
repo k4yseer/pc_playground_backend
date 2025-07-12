@@ -45,4 +45,17 @@ export class RamService {
     }
     return this.ramRepository.remove(ram); // Remove the entity from the database
   }
+
+  async findByRamFilepath(ramId: number): Promise<string | null> {
+    const ram = await this.ramRepository.findOne({ 
+      where: { ram_id: ramId },
+      select: ['ram_id', 'ramFilepath'] // Select only the necessary fields
+    });
+
+    if (!ram) {
+      throw new Error(`Ram with id ${ramId} not found`);
+    }
+
+    return ram.ramFilepath; // Return the file path of the RAM
+  }
 }

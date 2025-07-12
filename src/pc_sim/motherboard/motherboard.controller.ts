@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { MotherboardService } from './motherboard.service';
 import { CreateMotherboardDto } from './dto/create-motherboard.dto';
 import { UpdateMotherboardDto } from './dto/update-motherboard.dto';
+import { IntegerType } from 'typeorm';
 
 @Controller('motherboard')
 export class MotherboardController {
@@ -30,5 +31,14 @@ export class MotherboardController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.motherboardService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.motherboardService.findByMotherboardFilepath(id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

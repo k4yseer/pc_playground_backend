@@ -42,4 +42,9 @@ export class CreateCpuDto {
     @IsNotEmpty()
     @IsString()
     max_clock: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsOptional()
+    cpuFilepath?: string | null; // Optional field for the file path of the CPU
 }

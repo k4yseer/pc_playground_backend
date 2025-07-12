@@ -15,6 +15,7 @@ import { MotherboardModule } from './pc_sim/motherboard/motherboard.module';
 import { PsuModule } from './pc_sim/psu/psu.module';
 import { SsdModule } from './pc_sim/ssd/ssd.module';
 import { RamModule } from './pc_sim/ram/ram.module';
+import { ThreeJsModelsModule } from './three-js-models/three-js-models.module';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { RamModule } from './pc_sim/ram/ram.module';
 
     RecommendationModule,
     CpuModule, CpuCaseModule, CpuCoolerModule, GameModule, GpuModule, MotherboardModule,
-    PsuModule, SsdModule, RamModule
+    PsuModule, SsdModule, RamModule, ThreeJsModelsModule
 
   ],
   controllers: [AppController],

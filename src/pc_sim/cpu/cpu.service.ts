@@ -49,7 +49,22 @@ export class CpuService {
     }
     return await this.cpuRepository.remove(cpu); // Remove the entity from the database
   }
+
+  async findByCpuFilepath(cpuId: number): Promise<string | null> {
+    const cpu = await this.cpuRepository.findOne({ 
+      where: { cpu_id: cpuId },
+      select: ['cpu_id', 'cpuFilepath'] // Select only the necessary fields
+     });
+
+    if (!cpu) {
+      throw new Error(`Cpu with id ${cpuId} not found`);
+    }
+    
+    if (!cpu.cpuFilepath) {
+      return null; // Return null if cpuFilepath is not set
+    }
+    
+    // Return the cpuFilepath if it exists
+    return cpu.cpuFilepath;
+  }
 }
-// async findByName(name: string): Promise<Psu[]> {
-  //   return this.psuRepository.find({ where: { psu_name: name } }); // Find PSUs by name
-  // }

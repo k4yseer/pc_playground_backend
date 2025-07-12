@@ -25,4 +25,7 @@ export class CpuCase {
 
     @Column({ type: 'text' })
     dimension: string;
+
+    @Column({ type: 'text', nullable: true })
+    cpuCaseFilepath: string | null; // Optional field for the file path of the
 }

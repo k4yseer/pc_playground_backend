@@ -41,4 +41,17 @@ export class MotherboardService {
     }
     return await this.motherboardRepository.remove(motherboard); // Remove the entity from the database
   }
+
+  async findByMotherboardFilepath(motherboardId: number): Promise<string | null> {
+    const motherboard = await this.motherboardRepository.findOne({ 
+      where: { motherboard_id: motherboardId },
+      select: ['motherboard_id', 'motherboardFilepath'] // Select only the necessary fields
+    });
+
+    if (!motherboard) {
+      throw new Error(`Motherboard with id ${motherboardId} not found`);
+    }
+
+    return motherboard.motherboardFilepath; // Return the file path of the motherboard
+  }
 }

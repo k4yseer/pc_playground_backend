@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { CpuCaseService } from './cpu_case.service';
 import { CreateCpuCaseDto } from './dto/create-cpu_case.dto';
 import { UpdateCpuCaseDto } from './dto/update-cpu_case.dto';
@@ -30,5 +30,14 @@ export class CpuCaseController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cpuCaseService.remove(+id);
+  }
+
+  @Get('model/:id')
+  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+    const url = await this.cpuCaseService.findByCpuCaseFilepath(id);
+    if (url === null) {
+      return { url: null };
+    }
+    return { url };
   }
 }

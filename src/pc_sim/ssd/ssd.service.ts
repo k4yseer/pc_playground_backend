@@ -43,4 +43,17 @@ export class SsdService {
     return await this.ssdRepository.remove(ssd);
   }
 
+  async findBySsdFilepath(ssdId: number): Promise<string | null> {
+    const ssd = await this.ssdRepository.findOne({ 
+      where: { ssd_id: ssdId },
+      select: ['ssd_id', 'ssdFilepath'] // Select only the necessary fields
+    });
+
+    if (!ssd) {
+      throw new Error(`Ssd with id ${ssdId} not found`);
+    }
+
+    return ssd.ssdFilepath;
+  }
+
 }

@@ -40,4 +40,8 @@ export class Motherboard {
     
     @Column({ type: 'integer' })
     sata_6gbs: number;
+
+    @Column({ type: 'text' , nullable: true })
+    motherboardFilepath: string | null; // Optional field for the file path of the motherboard
+
 }
