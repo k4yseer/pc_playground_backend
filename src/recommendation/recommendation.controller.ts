@@ -58,6 +58,27 @@ export class RecommendationController {
     async preset_recomendation (@Body() data) {
       return this.recommendationService.getBestPreset(data.gameId)
     }
+
+  @Post('Compatible')
+    async isCompatible(@Body() data) {
+      return this.recommendationService.isCompatibleMain(
+        data.gameId,
+        data.cpuIndex,
+        data.gpuIndex,
+        data.motherboardIndex,
+        data.coolerIndex,
+        data.ssdIndex,
+        data.ramIndex,
+        data.psuIndex,
+        data.caseIndex
+      )
+    }
+
+
+
+
+
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.recommendationService.findOne(+id);
