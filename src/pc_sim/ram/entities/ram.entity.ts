@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity('ram2')
 export class Ram {
     @PrimaryGeneratedColumn({ name: 'ram_id' })
     ram_id: number;
@@ -17,6 +17,6 @@ export class Ram {
     @Column({ name: 'speed', type: 'text' })
     speed: string;
 
-    @Column({ name: 'ram_filepath', type: 'text', nullable: true })
+    @Column({ name: 'ramFilepath', type: 'text', nullable: true })
     ramFilepath: string | null; // Optional field for the file path of the RAM
 }
