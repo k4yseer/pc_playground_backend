@@ -73,11 +73,6 @@ export class RecommendationController {
         data.caseIndex
       )
     }
-
-
-
-
-
   
   @Get(':id')
   findOne(@Param('id') id: string) {

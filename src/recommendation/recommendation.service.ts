@@ -463,8 +463,8 @@ async getPresetCpu() {
       motherboard: await this.motherboardService.findOne(167),
       cooler: await this.CpuCoolerService.findOne(10),
       ssd: await this.SsdService.findOne(337),
-      ram: await this.RamService.findOne(637),
-      psu: await this.PsuService.findOne(53),
+      ram: await this.RamService.findOne(247),
+      psu: await this.PsuService.findOne(56),
       case: await this.CpuCaseService.findOne(39)   
     }
     const high_tier = {
@@ -473,7 +473,7 @@ async getPresetCpu() {
       motherboard: await this.motherboardService.findOne(1),
       cooler: await this.CpuCoolerService.findOne(26),
       ssd: await this.SsdService.findOne(8),
-      ram: await this.RamService.findOne(2969),
+      ram: await this.RamService.findOne(2),
       psu: await this.PsuService.findOne(1),
       case: await this.CpuCaseService.findOne(1)
     }
@@ -725,7 +725,7 @@ async getPresetCpu() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////THIS IS FOR CPU-GPU-PSU CHECK////////////////////////////// 
     let gpuTdp = gpuSpecs.tdp.split(' ')[0]
-    //console.log(gpuTdp,cpuSpecs.tdp,psuSpecs.max_power)
+    console.log(gpuTdp,cpuSpecs.tdp,psuSpecs.max_power)
     if (psuSpecs.max_power < ((Number(gpuTdp) + Number(cpuSpecs.tdp) + 210)*1.3)) {
       errorMessage.push('CPU is incompatible with PSU (Not enough Power)')
     }
@@ -865,6 +865,7 @@ async getPresetCpu() {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////THIS IS FOR SSD-GAME CHECK/////////////////////////////////////
     if (gameSpecs.storage > ssdSpecs.capacity) {
+      //console.log(gameSpecs.storage,ssdSpecs.capacity)
       errorMessage.push("SSD is incompatible with Game (Not enough Storage)")
     }
     return errorMessage
@@ -886,7 +887,7 @@ async getPresetCpu() {
   ////////////////////////////////////////////THIS IS FOR RAM-MOTHERBOARD CHECK//////////////////////////////
 
     
-    if (gameSpecs.memory < ramSize) {
+    if (gameSpecs.memory > ramSize) {
       errorMessage.push("RAM is incompatible with Game (Not Enough Ram)")
     }
 
