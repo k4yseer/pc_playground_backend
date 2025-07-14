@@ -474,7 +474,7 @@ async getPresetCpu() {
       cooler: await this.CpuCoolerService.findOne(26),
       ssd: await this.SsdService.findOne(8),
       ram: await this.RamService.findOne(2),
-      psu: await this.PsuService.findOne(1),
+      psu: await this.PsuService.findOne(40),
       case: await this.CpuCaseService.findOne(1)
     }
 
