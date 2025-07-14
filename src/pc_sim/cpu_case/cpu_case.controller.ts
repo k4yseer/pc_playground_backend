@@ -33,7 +33,7 @@ export class CpuCaseController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findByCpuCaseFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.cpuCaseService.findByCpuCaseFilepath(id);
     if (url === null) {
       return { url: null };

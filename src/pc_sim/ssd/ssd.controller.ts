@@ -33,7 +33,7 @@ export class SsdController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findBySsdFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.ssdService.findBySsdFilepath(+id);
     if (url === null) {
       return { url: null };

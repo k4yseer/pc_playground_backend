@@ -31,13 +31,4 @@ export class CpuCoolerController {
   remove(@Param('id') id: string) {
     return this.cpuCoolerService.remove(+id);
   }
-
-  @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
-    const url = await this.cpuCoolerService.findByCpuCoolerFilepath(id);
-    if (url === null) {
-      return { url: null };
-    }
-    return { url };
-  }
 }

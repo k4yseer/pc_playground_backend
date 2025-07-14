@@ -34,7 +34,7 @@ export class GpuController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findByGpuFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.gpuService.findByGpuFilepath(+id);
     if (url === null) {
       return { url: null };

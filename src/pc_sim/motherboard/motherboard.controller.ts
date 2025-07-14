@@ -34,7 +34,7 @@ export class MotherboardController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findByMotherboardFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.motherboardService.findByMotherboardFilepath(id);
     if (url === null) {
       return { url: null };

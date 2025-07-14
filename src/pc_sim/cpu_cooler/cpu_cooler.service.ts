@@ -45,16 +45,4 @@ export class CpuCoolerService {
     return await this.cpuCoolerRepository.remove(cpuCooler); // Remove the entity from the database
   }
 
-  async findByCpuCoolerFilepath(cpuCoolerId: number): Promise<string | null> {
-    const cpuCooler = await this.cpuCoolerRepository.findOne({ 
-      where: { cpu_cooler_id: cpuCoolerId },
-      select: ['cpu_cooler_id', 'cpuCoolerFilepath'] // Select only the necessary fields
-    });
-
-    if (!cpuCooler) {
-      throw new Error(`CpuCooler with id ${cpuCoolerId} not found`);
-    }
-
-    return cpuCooler.cpuCoolerFilepath || null; // Return the file path or null if not set
-  }
 }

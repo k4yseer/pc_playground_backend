@@ -33,7 +33,7 @@ export class PsuController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findByPsuFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.psuService.findByPsuFilepath(+id);
     if (url === null) {
       return { url: null };

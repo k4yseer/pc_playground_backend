@@ -33,7 +33,7 @@ export class RamController {
   }
 
   @Get('model/:id')
-  async getGltfModelDirectUrl(@Param('id', ParseIntPipe) id: number) {
+  async findByRamFilepath(@Param('id', ParseIntPipe) id: number) {
     const url = await this.ramService.findByRamFilepath(+id);
     if (url === null) {
       return { url: null };
