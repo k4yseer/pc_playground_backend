@@ -371,7 +371,6 @@ export class RecommendationService {
     });
 
     if (motherboardSpecs && gameStorage > 0) {
-      let m2_support_list = motherboardSpecs.m2_support.split(' ')
       let ssdFilter = ssdAll.filter(ssd => {
         let ssdInterface = ssd.interface.trim().toLowerCase()
 
@@ -381,7 +380,7 @@ export class RecommendationService {
         else if (ssdInterface == 'pcie x4' || ssdInterface == 'pcie x2') {
          
           //console.log(m2_support_list,ssd.m2_format)
-          if (m2_support_list.includes(String(ssd.m2_format))) {
+          if (motherboardSpecs.m2_support.includes(String(ssd.m2_format))) {
             return Number(ssd.capacity) > gameStorage && motherboardSpecs.m2_connectors >= 1
           }
         }
@@ -449,9 +448,9 @@ export class RecommendationService {
     
     let caseList = caseAll.filter(cases => {
         return cases.motherboard_support.includes(motherboardType) && Number(cases.gpu_size_clearance) > gpuMaxDimension 
-       && Number(cases.cpu_cooler_clearance) > coolerMaxDimension && Number(cases.psu_size_clearance) > psuMaxDimension
+        && Number(cases.cpu_cooler_clearance) > coolerMaxDimension && Number(cases.psu_size_clearance) > psuMaxDimension
     })
-   return caseList 
+    return caseList 
   }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -481,10 +480,9 @@ async getPresetCpu() {
     return [low_tier,high_tier]
 }
     
-   
 
     //return high_level
- async getGameAllspecs(gameId) {
+async getGameAllspecs(gameId) {
     let gameAll = await this.gameService.findAll()
     
     var gameIntelProcessorTier = 0
@@ -542,8 +540,8 @@ async getPresetCpu() {
                   }
                 }
                 }
-                const regexPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
-                const cpuRequirements = Array.from(game.processor.matchAll(regexPattern))
+                const regexCpuPattern = new RegExp("(Intel|AMD)\\s+(Core(?: Ultra)?|Ryzen)\\s*(?:i)?\\s*([3579])\\s*-?\\s*([A-Za-z]*)(\\d{3,5})([A-Za-z+]*)?","gi")
+                const cpuRequirements = Array.from(game.processor.matchAll(regexCpuPattern))
                 for (const requirement of cpuRequirements) {
                   let brandRequirement = new Map<string,string>()
                   brandRequirement.set('brand',requirement[1])
@@ -581,7 +579,7 @@ async getPresetCpu() {
                 }
               }
             }
-         )
+          )
         }
       )
       //console.log(gameAmdGraphics,gameAmdProcessorCode,gameAmdProcessorTier,gameIntelGraphics,gameIntelProcessorCode,gameIntelProcessorTier,gameMemory,gameStorage)
@@ -617,7 +615,7 @@ async getPresetCpu() {
         else {
           return 'Error code 1'
         }
-       }
+      }
 
       if (preset.gpu) { //THIS IS FOR GPU OBJECT
         let presetGpuBrand = preset.gpu.gpu_code.split(' ')[0]
@@ -669,18 +667,20 @@ async getPresetCpu() {
 
     let errorMessage:string[] = [] 
 
+    //return (await this.isCompatibleCase(caseSpecs,motherboardSpecs,gpuSpecs,coolerSpecs,psuSpecs))
     if (gameSpecs && cpuSpecs && gpuSpecs && motherboardSpecs &&coolerSpecs && ssdSpecs && ramSpecs && psuSpecs && caseSpecs) {
       errorMessage.push(...await this.isCompatibleCpu(gameSpecs,cpuSpecs,coolerSpecs,motherboardSpecs,gpuSpecs,psuSpecs))
-      errorMessage.push (... await this.isCompatibleGpu(gpuSpecs,motherboardSpecs,caseSpecs,cpuSpecs,psuSpecs))
+      errorMessage.push (... await this.isCompatibleGpu(gpuSpecs,motherboardSpecs,caseSpecs,cpuSpecs,psuSpecs,gameSpecs))
       errorMessage.push(... await this.isCompatibleMotherboard(motherboardSpecs,cpuSpecs,gpuSpecs,ramSpecs,ssdSpecs,psuSpecs,caseSpecs))
       errorMessage.push(... await this.isCompatibleCooler(coolerSpecs,cpuSpecs,caseSpecs))
       errorMessage.push(... await this.isCompatibleSsd(ssdSpecs,motherboardSpecs,gameSpecs))
       errorMessage.push(... await this.isCompatibleRam(ramSpecs,motherboardSpecs,gameSpecs))
       errorMessage.push (... await this.isCompatiblePSU(psuSpecs,gpuSpecs,cpuSpecs,motherboardSpecs,caseSpecs))
+      errorMessage.push (... await this.isCompatibleCase(caseSpecs,motherboardSpecs,gpuSpecs,coolerSpecs,psuSpecs))
     }
 
-    if (errorMessage.length == 0) {
-      return { "message": "All is Good" }
+    if (errorMessage.every(msg => msg === 'Compatible')) {
+      return {"message":'All is Good'}
     }
     else {
       return errorMessage
@@ -694,266 +694,230 @@ async getPresetCpu() {
     ///////////////////////////////////////////////THIS IS FOR CPU-GAME CHECK///////////////////////////////////////
     //console.log(gameSpecs)
     let errorMessage:string[] = []
-    if (cpuSpecs.brand == 'Intel') {
-      if (cpuSpecs.cpu_tier < gameSpecs.intelProcessorTier || cpuSpecs.cpu_code < gameSpecs.intelProcessorCode) {
-        errorMessage.push('Cpu does not meet the game minimum requirement')
-      }
-    else if (cpuSpecs.brand == 'AMD') {
-      if (cpuSpecs.cpu_tier < gameSpecs.amdProcessorTier || cpuSpecs.cpu_code < gameSpecs.amdProcessorCode) {
-        errorMessage.push('Cpu does not meet the game minimum requirement')
-      }
-    }
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////THIS IS FOR CPU-COOLER CHECK////////////////////////
-    if (cpuSpecs.brand == 'Intel') {
-      if (coolerSpecs.intel_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
-        errorMessage.push('Cpu is incompatible with Cpu Cooler')
-      }
-     }
-    else if (cpuSpecs.brand == 'AMD') {
-      if (coolerSpecs.amd_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
-        errorMessage.push('Cpu is incompatible with Cpu Cooler')
-      }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-MOTHERBOARD CHECK//////////////////////////////
-    if (motherboardSpecs.socket.includes(cpuSpecs.cpu_socket) == false) {
-      errorMessage.push ('Cpu is incompatible with Motherboard (Wrong Socket)')
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-GPU-PSU CHECK////////////////////////////// 
-    let gpuTdp = gpuSpecs.tdp.split(' ')[0]
-    console.log(gpuTdp,cpuSpecs.tdp,psuSpecs.max_power)
-    if (psuSpecs.max_power < ((Number(gpuTdp) + Number(cpuSpecs.tdp) + 210)*1.3)) {
-      errorMessage.push('CPU is incompatible with PSU (Not enough Power)')
-    }
+    errorMessage.push(await this.checkGameCpu(gameSpecs,cpuSpecs))
+    errorMessage.push(await this.checkCpuCooler(cpuSpecs,coolerSpecs))
+    errorMessage.push(await this.checkCpuMotherboard(cpuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkCpuGpuPsu(cpuSpecs,gpuSpecs,psuSpecs))
     return errorMessage
   }
 
 
-  async isCompatibleGpu(gpuSpecs,motherboardSpecs,caseSpecs,cpuSpecs,psuSpecs) {
+  async isCompatibleGpu(gpuSpecs,motherboardSpecs,caseSpecs,cpuSpecs,psuSpecs,gameSpecs) {
     let errorMessage:string[] = []
-    //return [gpuSpecs,motherboardSpecs,caseSpecs,cpuSpecs,psuSpecs]
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR GPU-MOTHERBOARD CHECK//////////////////////////////
-    if (motherboardSpecs.pcie_x16 == 0) {
-      errorMessage.push('GPU is incompatible with Motherboard (Motherboard no PCIe x16 slot)')
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR GPU-CASE CHECK//////////////////////////////
-    if (gpuSpecs.dimension > caseSpecs.gpu_size_clearance) {
-      errorMessage.push('GPU is incompatible with Case (Not enough Clearance)')
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-GPU-PSU CHECK////////////////////////////// 
-    let gpuTdp = gpuSpecs.tdp.split(' ')[0]
-    if (psuSpecs.max_power < ((Number(gpuTdp) + Number(cpuSpecs.tdp) + 210)*1.3)) {
-      errorMessage.push('GPU is incompatible with PSU (Not enough Power)')
-    }
+    errorMessage.push(await this.checkGameGpu(gameSpecs,gpuSpecs))
+    errorMessage.push(await this.checkGpuMotherboard(gpuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkGpuCase(gpuSpecs,caseSpecs)) 
+    errorMessage.push(await this.checkCpuGpuPsu(cpuSpecs,gpuSpecs,psuSpecs))
     return errorMessage
   } 
   
   async isCompatibleMotherboard(motherboardSpecs,cpuSpecs,gpuSpecs,ramSpecs,ssdSpecs,psuSpecs,caseSpecs) {
     let errorMessage:string[] = []
-    //return [motherboardSpecs,cpuSpecs,gpuSpecs,ramSpecs,ssdSpecs,psuSpecs,caseSpecs]
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR GPU-MOTHERBOARD CHECK//////////////////////////////
-    if (motherboardSpecs.pcie_x16 == 0) {
-      errorMessage.push('Motherboard is incompatible with GPU (Motherboard no PCIe x16 slot)')
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-MOTHERBOARD CHECK//////////////////////////////
-    if (motherboardSpecs.socket.includes(cpuSpecs.cpu_socket) == false) {
-      errorMessage.push ('Motherboard is incompatible with CPU (Wrong Socket)')
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR RAM-MOTHERBOARD CHECK//////////////////////////////
-    let ram = ramSpecs.capacity.split('GB (')
-    let ramSize = Number(ram[0])
-    let ramSlots= Number(ram[1].split(' x')[0])
-    if (motherboardSpecs.ram_type != ramSpecs.ramType || motherboardSpecs.ram_max_speed < ramSpecs.speed || motherboardSpecs.ram_slots < ramSlots || motherboardSpecs.ram_max_size < ramSize) {
-      errorMessage.push("Motherboard is Not compatible with RAM")
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR SSD-MOTHERBOARD CHECK////////////////////////////// 
-    let ssdInterface = ssdSpecs.interface.trim().toLowerCase()
-    if (ssdInterface == 'sata 6 /s') {
-      if (motherboardSpecs.sata_6gbs < 1) {
-        errorMessage.push("Motherboard is not compatible with SSD")
-      }
-    else if (ssdInterface == 'pcie x4' || ssdInterface == 'pcie x2') {
-      if (motherboardSpecs.m2_support_list.includes(String(ssdSpecs.m2_format)) == false || motherboardSpecs.m2_connectors < 1) {
-            errorMessage.push("Motherboard is not compatible with SSD")
-          }
-      }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR PSU-MOTHERBOARD CHECK////////////////////////////// 
-
-    if (psuSpecs.type == 'ATX') {
-          if (motherboardSpecs.form_factor == 'ATX' || motherboardSpecs.form_factor == 'Micro ATX') {
-          }
-          else {
-            errorMessage.push("Motherboard is incompatible with PSU")
-          }
-        }
-    else if (psuSpecs.type == 'SFX') {
-          if (motherboardSpecs.form_factor != 'Mini-ITX') {
-            errorMessage.push("Motherboard is incompatible with PSU")
-          }
-        }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CASE-MOTHERBOARD CHECK////////////////////////////// 
-    const motherboardFormFactor = motherboardSpecs.form_factor.replace(" ", "-").toLowerCase()
-    const supportedFormFactors = caseSpecs.motherboard_support.split(',').map(f => f.trim().toLowerCase());
-
-    if (!supportedFormFactors.includes(motherboardFormFactor)) {
-      errorMessage.push("Motherboard is not Compatible with Case")
-    }
-
+    errorMessage.push(await this.checkGpuMotherboard(gpuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkCpuMotherboard(cpuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkRamMotheboard(ramSpecs,motherboardSpecs)) 
+    errorMessage.push(await this.checkSsdMotherboard(ssdSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkPsuMotherboard(psuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkMotherboardCase(motherboardSpecs,caseSpecs))
     return errorMessage
   }
 
   async isCompatibleCooler(coolerSpecs,cpuSpecs,caseSpecs) {
     let errorMessage:string[] = []
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-COOLER CHECK////////////////////////////// 
-    if (cpuSpecs.brand == 'Intel') {
-      if (coolerSpecs.intel_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
-        errorMessage.push('Cooler is incompatible with Cpu')
-      }
-     }
-    else if (cpuSpecs.brand == 'AMD') {
-      if (coolerSpecs.amd_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
-        errorMessage.push('Cooler is incompatible with Cpu')
-      }
-    }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR COOLER-CASE CHECK////////////////////////////// 
-  if (Number(caseSpecs.cpu_cooler_clearance) < Number(coolerSpecs.dimension)) {
-    errorMessage.push('Cooler is not compatible with Case')
-  }
-
+    errorMessage.push(await this.checkCpuCooler(cpuSpecs,coolerSpecs))
+    errorMessage.push(await this.checkCoolerCase(coolerSpecs,caseSpecs))
     return errorMessage
   }
 
   async isCompatibleSsd(ssdSpecs,motherboardSpecs,gameSpecs) {
     let errorMessage:string[] = []
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR SSD-MOTHERBOARD CHECK////////////////////////////// 
-    let ssdInterface = ssdSpecs.interface.trim().toLowerCase()
-    if (ssdInterface == 'sata 6 /s') {
-      if (motherboardSpecs.sata_6gbs < 1) {
-        errorMessage.push("SSD is not compatible with Motherboard")
-      }
-    else if (ssdInterface == 'pcie x4' || ssdInterface == 'pcie x2') {
-      if (motherboardSpecs.m2_support_list.includes(String(ssdSpecs.m2_format)) == false || motherboardSpecs.m2_connectors < 1) {
-            errorMessage.push("SSD is not compatible with Motherboard")
-          }
-      }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR SSD-GAME CHECK/////////////////////////////////////
-    if (gameSpecs.storage > ssdSpecs.capacity) {
-      //console.log(gameSpecs.storage,ssdSpecs.capacity)
-      errorMessage.push("SSD is incompatible with Game (Not enough Storage)")
-    }
+    errorMessage.push(await this.checkSsdMotherboard(ssdSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkGameSsd(gameSpecs,ssdSpecs))
     return errorMessage
   }
 
   async isCompatibleRam(ramSpecs,motherboardSpecs,gameSpecs) {
     let errorMessage:string[] = []
-    
-    let ram = ramSpecs.capacity.split('GB (')
-    let ramSize = Number(ram[0])
-    let ramSlots= Number(ram[1].split(' x')[0])
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR RAM-MOTHERBOARD CHECK//////////////////////////////
-    if (motherboardSpecs.ram_type != ramSpecs.ramType || motherboardSpecs.ram_max_speed < ramSpecs.speed || motherboardSpecs.ram_slots < ramSlots || motherboardSpecs.ram_max_size < ramSize) {
-      errorMessage.push("RAM is incompatible with Motherboard")
-    }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR RAM-MOTHERBOARD CHECK//////////////////////////////
-
-    
-    if (gameSpecs.memory > ramSize) {
-      errorMessage.push("RAM is incompatible with Game (Not Enough Ram)")
-    }
-
+    errorMessage.push(await this.checkRamMotheboard(ramSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkGameRam(gameSpecs,ramSpecs))
     return errorMessage
   }
 
   async isCompatiblePSU(psuSpecs,gpuSpecs,cpuSpecs,motherboardSpecs,caseSpecs) {
     let errorMessage:string[] = []
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR CPU-GPU-PSU CHECK//////////////////////////////
-    let gpuTdp = gpuSpecs.tdp.split(' ')[0]
-    if (psuSpecs.max_power < ((Number(gpuTdp) + Number(cpuSpecs.tdp) + 210)*1.3)) {
-      errorMessage.push('PSU is incompatible with GPU & CPU (Not enough Power)')
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////THIS IS FOR PSU-MOTHERBOARD CHECK////////////////////////////// 
-    if (psuSpecs.type == 'ATX') {
-          if (motherboardSpecs.form_factor == 'ATX' || motherboardSpecs.form_factor == 'Micro ATX') {
-          }
-          else {
-            errorMessage.push("PSU is incompatible with Motherboard")
-          }
-        }
-    else if (psuSpecs.type == 'SFX') {
-          if (motherboardSpecs.form_factor != 'Mini-ITX') {
-            errorMessage.push("PSU is incompatible with Motherboard")
-          }
-        }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR PSU-CASE CHECK////////////////////////////// 
-  if (Number(caseSpecs.psu_size_clearance) < Number(psuSpecs.dimension)) {
-    errorMessage.push('PSU is incompatible with Case')
-  }
+    errorMessage.push(await this.checkCpuGpuPsu(cpuSpecs,gpuSpecs,psuSpecs)) 
+    errorMessage.push(await this.checkPsuMotherboard(psuSpecs,motherboardSpecs))
+    errorMessage.push(await this.checkPsuCase(psuSpecs,caseSpecs))
     
     return errorMessage
   }
 
   async isCompatibleCase(caseSpecs,motherboardSpecs,gpuSpecs,coolerSpecs,psuSpecs) {
     let errorMessage:string[] = []
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR PSU-CASE CHECK////////////////////////////// 
-  if (Number(caseSpecs.psu_size_clearance) < Number(psuSpecs.dimension)) {
-    errorMessage.push('Case is incompatible with PSU')
-  }
+    errorMessage.push(await this.checkPsuCase(psuSpecs,caseSpecs))
+    errorMessage.push(await this.checkCoolerCase(coolerSpecs,caseSpecs))
+    errorMessage.push (await this.checkMotherboardCase(motherboardSpecs,caseSpecs))
+    errorMessage.push(await this.checkGpuCase(gpuSpecs,caseSpecs))
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR COOLER-CASE CHECK////////////////////////////// 
-  if (Number(caseSpecs.cpu_cooler_clearance) < Number(coolerSpecs.dimension)) {
-    errorMessage.push('Case is not compatible with Cooler')
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR CASE-MOTHERBOARD CHECK////////////////////////////// 
-  const motherboardFormFactor = motherboardSpecs.form_factor.replace(" ", "-").toLowerCase()
-  const supportedFormFactors = caseSpecs.motherboard_support.split(',').map(f => f.trim().toLowerCase());
-
-  if (!supportedFormFactors.includes(motherboardFormFactor)) {
-    errorMessage.push("Case is not Compatible with MotherBoard")
-  }
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////THIS IS FOR GPU-CASE CHECK//////////////////////////////
-  if (gpuSpecs.dimension > caseSpecs.gpu_size_clearance) {
-    errorMessage.push('Case is incompatible with GPU (Not enough Clearance)')
-  }
-  return errorMessage
+    return errorMessage
   }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async checkGpuCase(gpuSpecs,caseSpecs) {
+  if (gpuSpecs.dimension > caseSpecs.gpu_size_clearance) {
+    return ('Gpu is incompatible with Case (Not enough Clearance)')
+  }
+    return 'Compatible'
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+async checkMotherboardCase(motherboardSpecs,caseSpecs) {
+  const motherboardFormFactor = motherboardSpecs.form_factor.replace(" ", "-").toLowerCase()
+  const supportedFormFactors = caseSpecs.motherboard_support.split(',').map(f => f.trim().toLowerCase());
+  if (!supportedFormFactors.includes(motherboardFormFactor)) {
+    return ("Case is not Compatible with MotherBoard")
+  }
+  return 'Compatible'
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+async checkCoolerCase(coolerSpecs,caseSpecs) {
+  if (Number(caseSpecs.cpu_cooler_clearance) < Number(coolerSpecs.dimension)) {
+    return ('Case is not compatible with Cooler')
+  }
+return 'Compatible'
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+async checkPsuCase(psuSpecs,caseSpecs){
+  if (Number(caseSpecs.psu_size_clearance) < Number(psuSpecs.dimension)) {
+    return ('Case is incompatible with PSU')
+  }
+return 'Compatible'
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+async checkPsuMotherboard(psuSpecs,motherboardSpecs) {
+  if (psuSpecs.type == 'ATX') {
+          if (motherboardSpecs.form_factor == 'ATX' || motherboardSpecs.form_factor == 'Micro ATX') {
+          }
+          else {
+            return("PSU is incompatible with Motherboard")
+          }
+        }
+    else if (psuSpecs.type == 'SFX') {
+          if (motherboardSpecs.form_factor != 'Mini-ITX') {
+            return("PSU is incompatible with Motherboard")
+          }
+        }
+  return 'Compatible'
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+async checkCpuGpuPsu(cpuSpecs,gpuSpecs,psuSpecs) {
+  let gpuTdp = gpuSpecs.tdp.split(' ')[0]
+  if (psuSpecs.max_poer < ((Number(gpuTdp) + Number(cpuSpecs.tdp) + 210)*1.3)) {
+    return ('PSU is incompatible with GPU & CPU (Not enough Power)')
+    }
+  return 'Compatible'
+}
+
+async checkGameRam(gameSpecs,ramSpecs) {
+  let ram = ramSpecs.capacity.split('GB (')
+  let ramSize = Number(ram[0])
+  if (gameSpecs.memory > ramSize) {
+      return ("RAM is incompatible with Game (Not Enough Ram)")
+    }
+  return 'Compatible'
+}
+
+async checkRamMotheboard(ramSpecs,motherboardSpecs) {
+  let ram = ramSpecs.capacity.split('GB (')
+  let ramSize = Number(ram[0])
+  let ramSlots= Number(ram[1].split(' x')[0])
+    if (motherboardSpecs.ram_type != ramSpecs.ramType || motherboardSpecs.ram_max_speed < ramSpecs.speed || motherboardSpecs.ram_slots < ramSlots || motherboardSpecs.ram_max_size < ramSize) {
+      return ("RAM is incompatible with Motherboard")
+    }
+  return 'Compatible'
+}
+
+async checkGameSsd(gameSpecs,ssdSpecs) {
+  if (gameSpecs.storage > ssdSpecs.capacity) {
+      return ("SSD is incompatible with Game (Not enough Storage)")
+    }
+  return 'Compatible'
+}
+
+async checkSsdMotherboard(ssdSpecs,motherboardSpecs) {
+  let ssdInterface = ssdSpecs.interface.trim().toLowerCase()
+    if (ssdInterface == 'sata 6 /s') {
+      if (motherboardSpecs.sata_6gbs < 1) {
+        return("SSD is not compatible with Motherboard")
+      }
+    }
+    else if (ssdInterface == 'pcie x4' || ssdInterface == 'pcie x2') {
+      //console.log(1)
+      //console.log(motherboardSpecs)
+      //console.log(ssdSpecs.m2_format,motherboardSpecs.m2_support)
+      if (motherboardSpecs.m2_support.includes(String(ssdSpecs.m2_format)) == false || motherboardSpecs.m2_connectors < 1) {
+        return ("SSD is not compatible with Motherboard")
+      }
+    }
+  return 'Compatible'
+}
+
+async checkCpuCooler(cpuSpecs,coolerSpecs) {
+  if (cpuSpecs.brand == 'Intel') {
+    //console.log(2)
+      if (coolerSpecs.intel_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
+        return ('Cooler is incompatible with Cpu')
+      }
+    }
+    else if (cpuSpecs.brand == 'AMD') {
+      //console.log(3)
+      if (coolerSpecs.amd_socket.includes(cpuSpecs.cpu_socket) == false || coolerSpecs.reccomended_tdp < Number(cpuSpecs.tdp)) {
+        return ('Cooler is incompatible with Cpu')
+      }
+    }
+  return 'Compatible'
+}
+async checkCpuMotherboard(cpuSpecs,motherboardSpecs) {
+  //console.log(4)
+    if (motherboardSpecs.socket.includes(cpuSpecs.cpu_socket) == false) {
+      return ('Motherboard is incompatible with CPU (Wrong Socket)')
+    }
+  return 'Compatible'
+}
+
+async checkGpuMotherboard(gpuSpecs,motherboardSpecs) {
+  if (motherboardSpecs.pcie_x16 == 0) {
+      return ('Motherboard is incompatible with GPU (Motherboard no PCIe x16 slot)')
+    }
+  return 'Compatible'
+}
+
+async checkGameGpu(gameSpecs,gpuSpecs) {
+  let GpuBrand = gpuSpecs.gpu_code.split(' ')[0]
+  let GpuCode = gpuSpecs.gpu_code.split(' ')[1] 
+    if (GpuBrand == 'RTX' || GpuBrand == 'GTX') {
+      if (Number(GpuCode) < gameSpecs.intelGraphics) {
+            return ('Gpu is incompatible with Game')
+          }
+        }
+        else if (GpuBrand == 'RX') {
+          if (Number(GpuCode) < gameSpecs.amdGraphics) {
+            return ('Gpu is incompatible with Game')
+          }
+        }
+  return 'Compatible' 
+}
+
+async checkGameCpu(gameSpecs,cpuSpecs) {
+  if (cpuSpecs.brand == 'Intel') {
+      if (cpuSpecs.cpu_tier < gameSpecs.intelProcessorTier || cpuSpecs.cpu_code < gameSpecs.intelProcessorCode) {
+        return('Cpu does not meet the game minimum requirement')
+      }
+    else if (cpuSpecs.brand == 'AMD') {
+      if (cpuSpecs.cpu_tier < gameSpecs.amdProcessorTier || cpuSpecs.cpu_code < gameSpecs.amdProcessorCode) {
+        return ('Cpu does not meet the game minimum requirement')
+      }
+    }
+    }
+  return 'Compatible'
+}
 } // END of FILE SHLD BE YELLOW
