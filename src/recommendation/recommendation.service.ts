@@ -680,7 +680,7 @@ async getPresetCpu() {
     }
 
     if (errorMessage.length == 0) {
-      return 'All is Good'
+      return { "message": "All is Good" }
     }
     else {
       return errorMessage
