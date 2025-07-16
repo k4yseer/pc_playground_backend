@@ -683,7 +683,7 @@ async getGameAllspecs(gameId) {
       return {"message":'All is Good'}
     }
     else {
-      return errorMessage
+      return errorMessage = errorMessage.filter(msg => msg !== 'Compatible')
     }
     
   }
