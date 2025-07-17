@@ -679,6 +679,8 @@ async getGameAllspecs(gameId) {
       errorMessage.push (... await this.isCompatibleCase(caseSpecs,motherboardSpecs,gpuSpecs,coolerSpecs,psuSpecs))
     }
 
+    errorMessage = [...new Set(errorMessage)];
+
     if (errorMessage.every(msg => msg === 'Compatible')) {
       return {"message":'All is Good'}
     }
