@@ -58,7 +58,7 @@ export class CpuCoolerService {
     let query = this.cpuCoolerRepository
       .createQueryBuilder("cpu_cooler")
       .orderBy("cpu_cooler.cpu_cooler_id", "ASC")
-      .where("cpu_cooler.cooler_name like :search", {search: search ?`%${search}%` : "%" })
+      .where("cpu_cooler.cooler_name ilike :search", {search: search ?`%${search}%` : "%" })
       .limit(limit)
       .offset(offset);
 

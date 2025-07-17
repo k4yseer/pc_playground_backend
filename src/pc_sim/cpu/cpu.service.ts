@@ -80,7 +80,7 @@ export class CpuService {
       let query = this.cpuRepository
         .createQueryBuilder("cpu")
         .orderBy("cpu.cpu_id", "ASC")
-        .where("cpu.cpu_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("cpu.cpu_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
   

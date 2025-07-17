@@ -71,7 +71,7 @@ export class PsuService {
       let query = this.psuRepository
         .createQueryBuilder("psu")
         .orderBy("psu.psu_id", "ASC")
-        .where("psu.psu_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("psu.psu_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
   

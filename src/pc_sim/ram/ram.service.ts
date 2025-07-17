@@ -70,7 +70,7 @@ export class RamService {
       let query = this.ramRepository
         .createQueryBuilder("ram")
         .orderBy("ram.ram_id", "ASC")
-        .where("ram.ram_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("ram.ram_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
   

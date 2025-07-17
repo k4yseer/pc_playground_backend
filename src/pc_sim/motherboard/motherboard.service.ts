@@ -67,7 +67,7 @@ export class MotherboardService {
       let query = this.motherboardRepository
         .createQueryBuilder("motherboard")
         .orderBy("motherboard.motherboard_id", "ASC")
-        .where("motherboard.motherboard_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("motherboard.motherboard_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
   

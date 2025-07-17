@@ -71,7 +71,7 @@ export class CpuCaseService {
     let query = this.cpuCaseRepository
       .createQueryBuilder("cpu_case")
       .orderBy("cpu_case.cpu_case_id", "ASC")
-      .where("cpu_case.case_name like :search", {search: search ?`%${search}%` : "%" })
+      .where("cpu_case.case_name ilike :search", {search: search ?`%${search}%` : "%" })
       .limit(limit)
       .offset(offset);
 

@@ -19,7 +19,7 @@ import { ThreeJsModelsModule } from './three-js-models/three-js-models.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({envFilePath: ".env"}),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,7 +30,7 @@ import { ThreeJsModelsModule } from './three-js-models/three-js-models.module';
         password :configService.get<string>("DATABASE_PASSWORD"),
         host: configService.get<string>("HOST"),
         database: "postgres",
-        entities: [join(process.cwd(), '/../**/*.entity.js')],
+        entities: [join(process.cwd(), '/**/**/*.entity.js')],
         // synchronize: true // Note: Set to false in production
       })
     }),

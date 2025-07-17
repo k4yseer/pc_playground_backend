@@ -66,12 +66,13 @@ export class GpuService {
       let query = this.gpuRepository
         .createQueryBuilder("gpu")
         .orderBy("gpu.gpu_id", "ASC")
-        .where("gpu.gpu_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("gpu.gpu_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
-  
+
       const [data, total] = await query.getManyAndCount();
-  
+      console.log(search)
+      console.log(data)
       const totalPages = Math.ceil(total / limit);
   
       return {

@@ -68,7 +68,7 @@ export class SsdService {
       let query = this.ssdRepository
         .createQueryBuilder("ssd")
         .orderBy("ssd.ssd_id", "ASC")
-        .where("ssd.ssd_name like :search", {search: search ?`%${search}%` : "%" })
+        .where("ssd.ssd_name ilike :search", {search: search ?`%${search}%` : "%" })
         .limit(limit)
         .offset(offset);
   

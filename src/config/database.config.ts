@@ -5,12 +5,12 @@ const postgresConfig = () => {
     return {
     type:"postgres",
     port:5432,
-    username:"postgres.rhlbvqmbuppyhseveoyr",
-    password: "pcsimulator_heap",
-    host: "aws-0-us-east-2.pooler.supabase.com",
+    username: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    host: process.env.HOST,
     database: "postgres",
     entities: ["dist/*/.entity{.ts,.js}"],
-    synchronize: true // Note: Set to false in production
+    synchronize: false // Note: Set to false in production
     }
 }
 export default registerAs("database", () => ({ config: postgresConfig }))
