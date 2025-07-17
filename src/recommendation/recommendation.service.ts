@@ -210,7 +210,6 @@ export class RecommendationService {
 
     gameAll.forEach(game=>{
       if (game.game_id == gameId[1]) {
-        console.log('hi')
       let game2Specs = game.graphics
       const regexPattern = new RegExp('\\b(RTX|GTX|RX)\\s*(\\d{3,4})\\b','gi');
       const gpuRequirements = Array.from(game2Specs.matchAll(regexPattern))
