@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { PsuService } from './psu.service';
 import { CreatePsuDto } from './dto/create-psu.dto';
 import { UpdatePsuDto } from './dto/update-psu.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
+import { Psu } from './entities/psu.entity';
 
 @Controller('psu')
 export class PsuController {
@@ -17,6 +19,13 @@ export class PsuController {
     return this.psuService.findAll();
   }
 
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<Psu>> {
+    return this.psuService.findAllPaginated(paginationDto);
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.psuService.findOne(+id);

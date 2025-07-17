@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { MotherboardService } from './motherboard.service';
 import { CreateMotherboardDto } from './dto/create-motherboard.dto';
 import { UpdateMotherboardDto } from './dto/update-motherboard.dto';
-import { IntegerType } from 'typeorm';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
+import { Motherboard } from './entities/motherboard.entity';
 
 @Controller('motherboard')
 export class MotherboardController {
@@ -18,6 +19,13 @@ export class MotherboardController {
     return this.motherboardService.findAll();
   }
 
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<Motherboard>> {
+    return this.motherboardService.findAllPaginated(paginationDto);
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.motherboardService.findOne(+id);

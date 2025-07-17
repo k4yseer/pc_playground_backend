@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put, Query } from '@nestjs/common';
 import { CpuService } from './cpu.service';
 import { CreateCpuDto } from './dto/create-cpu.dto';
 import { UpdateCpuDto } from './dto/update-cpu.dto';
-import { get } from 'http';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto';
+import { Cpu } from './entities/cpu.entity';
 
 @Controller('cpu')
 export class CpuController {
@@ -16,6 +17,13 @@ export class CpuController {
   @Get()
   async findAll() {
     return await this.cpuService.findAll();
+  }
+
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<Cpu>> {
+    return this.cpuService.findAllPaginated(paginationDto);
   }
 
   @Get(':id')

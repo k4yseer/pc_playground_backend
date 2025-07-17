@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { CpuCase } from './entities/cpu_case.entity';
 import { CreateCpuCaseDto } from './dto/create-cpu_case.dto';
 import { UpdateCpuCaseDto } from './dto/update-cpu_case.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
+
 
 
 @Injectable()
@@ -56,5 +58,36 @@ export class CpuCaseService {
     }
 
     return cpuCase.cpuCaseFilepath; // Return the file path or null if not set
+  }
+
+  async findAllPaginated(
+    paginationDto: paginationDto
+  ): Promise<PaginatedResult<CpuCase>> {
+    const page = parseInt(String(paginationDto.page || '1'), 10);
+    const limit = parseInt(String(paginationDto.limit || '25'), 10);
+    const search = paginationDto.search;
+    const offset = paginationDto.offset ? parseInt(String(paginationDto.offset), 10) : (page - 1) * limit;
+
+    let query = this.cpuCaseRepository
+      .createQueryBuilder("cpu_case")
+      .orderBy("cpu_case.cpu_case_id", "ASC")
+      .where("cpu_case.case_name like :search", {search: search ?`%${search}%` : "%" })
+      .limit(limit)
+      .offset(offset);
+
+    const [data, total] = await query.getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        totalItems: total,
+        itemCount: data.length,
+        itemsPerPage: limit,
+        currentPage: page,
+        totalPages,
+      },
+    };
   }
 }

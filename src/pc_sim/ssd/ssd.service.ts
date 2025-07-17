@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Ssd } from './entities/ssd.entity';
 import { CreateSsdDto } from './dto/create-ssd.dto';
 import { UpdateSsdDto } from './dto/update-ssd.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
 
 @Injectable()
 export class SsdService {
@@ -56,4 +57,34 @@ export class SsdService {
     return ssd.ssdFilepath;
   }
 
+  async findAllPaginated(
+      paginationDto: paginationDto
+    ): Promise<PaginatedResult<Ssd>> {
+      const page = parseInt(String(paginationDto.page || '1'), 10);
+      const limit = parseInt(String(paginationDto.limit || '25'), 10);
+      const search = paginationDto.search;
+      const offset = paginationDto.offset ? parseInt(String(paginationDto.offset), 10) : (page - 1) * limit;
+  
+      let query = this.ssdRepository
+        .createQueryBuilder("ssd")
+        .orderBy("ssd.ssd_id", "ASC")
+        .where("ssd.ssd_name like :search", {search: search ?`%${search}%` : "%" })
+        .limit(limit)
+        .offset(offset);
+  
+      const [data, total] = await query.getManyAndCount();
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        data,
+        meta: {
+          totalItems: total,
+          itemCount: data.length,
+          itemsPerPage: limit,
+          currentPage: page,
+          totalPages,
+        },
+      };
+    }
 }

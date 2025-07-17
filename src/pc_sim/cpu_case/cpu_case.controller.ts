@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { CpuCaseService } from './cpu_case.service';
 import { CreateCpuCaseDto } from './dto/create-cpu_case.dto';
 import { UpdateCpuCaseDto } from './dto/update-cpu_case.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto';
+import { CpuCase } from './entities/cpu_case.entity';
 
 @Controller('cpuCase')
 export class CpuCaseController {
@@ -10,6 +12,14 @@ export class CpuCaseController {
   @Post()
   create(@Body() createCpuCaseDto: CreateCpuCaseDto) {
     return this.cpuCaseService.create(createCpuCaseDto);
+  }
+
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<CpuCase>> {
+    return this.cpuCaseService.findAllPaginated(paginationDto);
+
   }
 
   @Get()

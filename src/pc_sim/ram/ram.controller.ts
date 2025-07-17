@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { RamService } from './ram.service';
 import { CreateRamDto } from './dto/create-ram.dto';
 import { UpdateRamDto } from './dto/update-ram.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
+import { Ram } from './entities/ram.entity';
 
 @Controller('ram')
 export class RamController {
@@ -16,7 +18,13 @@ export class RamController {
   findAll() {
     return this.ramService.findAll();
   }
-
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<Ram>> {
+    return this.ramService.findAllPaginated(paginationDto);
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ramService.findOne(+id);

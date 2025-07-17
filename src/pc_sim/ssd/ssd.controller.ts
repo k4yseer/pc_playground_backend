@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { SsdService } from './ssd.service';
 import { CreateSsdDto } from './dto/create-ssd.dto';
 import { UpdateSsdDto } from './dto/update-ssd.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
+import { Ssd } from './entities/ssd.entity';
 
 @Controller('ssd')
 export class SsdController {
@@ -17,6 +19,13 @@ export class SsdController {
     return this.ssdService.findAll();
   }
 
+  @Get('paginated')
+  async findAllPaginated(
+    @Query() paginationDto: paginationDto,
+  ): Promise<PaginatedResult<Ssd>> {
+    return this.ssdService.findAllPaginated(paginationDto);
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ssdService.findOne(+id);

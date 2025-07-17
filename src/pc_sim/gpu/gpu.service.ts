@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Gpu } from './entities/gpu.entity';
 import { CreateGpuDto } from './dto/create-gpu.dto';
 import { UpdateGpuDto } from './dto/update-gpu.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
 
 @Injectable()
 export class GpuService {
@@ -53,4 +54,35 @@ export class GpuService {
     }
     return gpu.gpuFilepath; // Return the file path of the GPU
   }
+
+  async findAllPaginated(
+      paginationDto: paginationDto
+    ): Promise<PaginatedResult<Gpu>> {
+      const page = parseInt(String(paginationDto.page || '1'), 10);
+      const limit = parseInt(String(paginationDto.limit || '25'), 10);
+      const search = paginationDto.search;
+      const offset = paginationDto.offset ? parseInt(String(paginationDto.offset), 10) : (page - 1) * limit;
+  
+      let query = this.gpuRepository
+        .createQueryBuilder("gpu")
+        .orderBy("gpu.gpu_id", "ASC")
+        .where("gpu.gpu_name like :search", {search: search ?`%${search}%` : "%" })
+        .limit(limit)
+        .offset(offset);
+  
+      const [data, total] = await query.getManyAndCount();
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        data,
+        meta: {
+          totalItems: total,
+          itemCount: data.length,
+          itemsPerPage: limit,
+          currentPage: page,
+          totalPages,
+        },
+      };
+    }
 }
