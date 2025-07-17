@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Ram } from './entities/ram.entity';
 import { CreateRamDto } from './dto/create-ram.dto';
 import { UpdateRamDto } from './dto/update-ram.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
 
 @Injectable()
 export class RamService {
@@ -58,4 +59,35 @@ export class RamService {
 
     return ram.ramFilepath; // Return the file path of the RAM
   }
+  async findAllPaginated(
+      paginationDto: paginationDto
+    ): Promise<PaginatedResult<Ram>> {
+      const page = parseInt(String(paginationDto.page || '1'), 10);
+      const limit = parseInt(String(paginationDto.limit || '25'), 10);
+      const search = paginationDto.search;
+      const offset = paginationDto.offset ? parseInt(String(paginationDto.offset), 10) : (page - 1) * limit;
+  
+      let query = this.ramRepository
+        .createQueryBuilder("ram")
+        .orderBy("ram.ram_id", "ASC")
+        .where("ram.ram_name like :search", {search: search ?`%${search}%` : "%" })
+        .limit(limit)
+        .offset(offset);
+  
+      const [data, total] = await query.getManyAndCount();
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        data,
+        meta: {
+          totalItems: total,
+          itemCount: data.length,
+          itemsPerPage: limit,
+          currentPage: page,
+          totalPages,
+        },
+      };
+    }
+
 }

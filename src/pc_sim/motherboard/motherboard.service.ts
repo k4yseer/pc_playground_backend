@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Motherboard } from './entities/motherboard.entity';
 import { CreateMotherboardDto } from './dto/create-motherboard.dto';
 import { UpdateMotherboardDto } from './dto/update-motherboard.dto';
+import { paginationDto, PaginatedResult } from '../paginationDto/pagination.dto'; // Import pagination DTO and result interface
 
 @Injectable()
 export class MotherboardService {
@@ -54,4 +55,35 @@ export class MotherboardService {
 
     return motherboard.motherboardFilepath; // Return the file path of the motherboard
   }
+
+  async findAllPaginated(
+      paginationDto: paginationDto
+    ): Promise<PaginatedResult<Motherboard>> {
+      const page = parseInt(String(paginationDto.page || '1'), 10);
+      const limit = parseInt(String(paginationDto.limit || '25'), 10);
+      const search = paginationDto.search;
+      const offset = paginationDto.offset ? parseInt(String(paginationDto.offset), 10) : (page - 1) * limit;
+  
+      let query = this.motherboardRepository
+        .createQueryBuilder("motherboard")
+        .orderBy("motherboard.motherboard_id", "ASC")
+        .where("motherboard.motherboard_name like :search", {search: search ?`%${search}%` : "%" })
+        .limit(limit)
+        .offset(offset);
+  
+      const [data, total] = await query.getManyAndCount();
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        data,
+        meta: {
+          totalItems: total,
+          itemCount: data.length,
+          itemsPerPage: limit,
+          currentPage: page,
+          totalPages,
+        },
+      };
+    }
 }
